@@ -1,0 +1,52 @@
+﻿
+Thanks for using JUnit! Support its development at https://junit.org/sponsoring
+
+[36m?[0m
+[36m??[0m [36mJUnit Platform Suite[0m [32m?[0m
+[36m??[0m [36mJUnit Jupiter[0m [32m?[0m
+[36m?  ??[0m [36mMatrixMathTest[0m [32m?[0m
+[36m?     ??[0m [34mpowerFibonacci()[0m [32m?[0m
+[36m?     ??[0m [34mequalsHandlesJaggedArrays()[0m [32m?[0m
+[36m?     ??[0m [34mioGarbageRejected()[0m [32m?[0m
+[36m?     ??[0m [34mbothLoopOrdersGiveSameResult()[0m [32m?[0m
+[36m?     ??[0m [34mdynamicChunkSizes()[0m [32m?[0m
+[36m?     ??[0m [34mtriangularRejectsWrongShape()[0m [32m?[0m
+[36m?     ??[0m [34mtriangularKnownResult()[0m [32m?[0m
+[36m?     ??[0m [34moneRow()[0m [32m?[0m
+[36m?     ??[0m [34mpowerMatchesSequentialReference()[0m [32m?[0m
+[36m?     ??[0m [34mpowerStaysInModRange()[0m [32m?[0m
+[36m?     ??[0m [34mstaticBlocksCoverAllRowsExactlyOnce()[0m [32m?[0m
+[36m?     ??[0m [34mprogressPrinterEndsWith100()[0m [32m?[0m
+[36m?     ??[0m [34mtriangularMatchesDenseReference()[0m [32m?[0m
+[36m?     ??[0m [34minvalidArgumentsRejected()[0m [32m?[0m
+[36m?     ??[0m [34midentity()[0m [32m?[0m
+[36m?     ??[0m [34mioRoundTripDenseAndTriangular()[0m [32m?[0m
+[36m?     ??[0m [34mzero()[0m [32m?[0m
+[36m?     ??[0m [34mprogressReachesExactly100Percent()[0m [32m?[0m
+[36m?     ??[0m [34mmultithreadedMatchesSequential()[0m [32m?[0m
+[36m?     ??[0m [34mrectangularKnownResult()[0m [32m?[0m
+[36m?     ??[0m [34msmallMatrixKnownResult()[0m [32m?[0m
+[36m?     ??[0m [34mpowerOne()[0m [32m?[0m
+[36m?     ??[0m [34mtriangularEachRowOnce()[0m [32m?[0m
+[36m?     ??[0m [34mioTruncatedStreamFails()[0m [32m?[0m
+[36m?     ??[0m [34moneColumn()[0m [32m?[0m
+[36m?     ??[0m [34mpowerIdentity()[0m [32m?[0m
+[36m?     ??[0m [34mincompatibleSizes()[0m [32m?[0m
+[36m?     ??[0m [34mrealProcessTransfer()[0m [32m?[0m
+[36m?     ??[0m [34moneByOne()[0m [32m?[0m
+[36m??[0m [36mJUnit Vintage[0m [32m?[0m
+
+Test run finished after 1613 ms
+[         4 containers found      ]
+[         0 containers skipped    ]
+[         4 containers started    ]
+[         0 containers aborted    ]
+[         4 containers successful ]
+[         0 containers failed     ]
+[        29 tests found           ]
+[         0 tests skipped         ]
+[        29 tests started         ]
+[         0 tests aborted         ]
+[        29 tests successful      ]
+[         0 tests failed          ]
+

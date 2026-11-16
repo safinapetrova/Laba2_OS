@@ -1,4 +1,3 @@
-/** Мелкие общие функции для разбора аргументов и прогрева JIT. */
 final class Cli {
     private Cli() {}
 
@@ -19,11 +18,6 @@ final class Cli {
         System.exit(2);
     }
 
-    /**
-     * Прогрев JIT: несколько неучитываемых умножений ТЕМ ЖЕ кодом (MatrixMath.computeRow),
-     * который потом замеряется. Прогрев в другом методе (как раньше в main) не помогает:
-     * JIT компилирует каждый метод отдельно.
-     */
     static void warmUpMultiply(MatrixMath.LoopOrder order) {
         long[][] a = MatrixMath.generateRandom(160, 160, 1);
         long[][] b = MatrixMath.generateRandom(160, 160, 2);
@@ -34,7 +28,7 @@ final class Cli {
             sink += MatrixMath.checksum(MatrixMath.multiply(a, b, 2, MatrixMath.Mode.DYNAMIC, 1, order, null));
             sink += MatrixMath.checksum(MatrixMath.multiplyTriangular(tri, b, 2, MatrixMath.Mode.DYNAMIC, 1, null));
         }
-        if (sink == 42) System.out.print(""); // не даём JIT выбросить вычисления
+        if (sink == 42) System.out.print("");
     }
 
     static void warmUpPower() {

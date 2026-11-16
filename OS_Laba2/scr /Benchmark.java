@@ -7,19 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Автоматические замеры по методике раздела 6: для каждой комбинации делается RUNS
- * (по умолчанию 5) замеров, отбрасываются min и max, остальные усредняются.
- * Сырые замеры и средние пишутся в CSV (каталог results/), графики строит scripts/plot.py.
- *
- *   java -cp out Benchmark mul   500,1000,2000           — «3»: время/ускорение от числа потоков
- *   java -cp out Benchmark order 2000                    — «3»: порядок циклов i→j→t и i→t→j (1 поток)
- *   java -cp out Benchmark tri   1000,2000,3000          — «4»: static и dynamic на треугольной A
- *   java -cp out Benchmark ipc   500,1000,2000           — «4»: передача и умножение
- *   java -cp out Benchmark pow   800 10                  — «5»: A^p, barrier и respawn
- *
- * Необязательные параметры в конце: threads=1,2,4,8  runs=5  out=results
- */
 public class Benchmark {
     private static int runs = 5;
     private static File outDir = new File("results");
@@ -58,7 +45,6 @@ public class Benchmark {
         if (sink == 42) System.out.println();
     }
 
-    /** 1, 2, …, L с шагом 1; до 2L с шагом max(1, L/4); плюс 4L и 8L. */
     static int[] defaultThreads(int L) {
         List<Integer> t = new ArrayList<>();
         for (int i = 1; i <= L; i++) t.add(i);
@@ -69,8 +55,6 @@ public class Benchmark {
         t.add(8 * L);
         return t.stream().mapToInt(Integer::intValue).toArray();
     }
-
-    // ------------------------------------------------------------------ эксперименты
 
     private interface Job {
         long[][] run();
@@ -173,12 +157,10 @@ public class Benchmark {
         }
     }
 
-    // ------------------------------------------------------------------ методика
-
     private static double[] measure(Job job) {
         double[] r = new double[runs];
         for (int i = 0; i < runs; i++) {
-            System.gc();                        // сборка мусора не должна попасть в замер
+            System.gc();                        
             long s = System.nanoTime();
             long[][] C = job.run();
             r[i] = Cli.sec(System.nanoTime() - s);
@@ -187,7 +169,6 @@ public class Benchmark {
         return r;
     }
 
-    /** Отбросить min и max, усреднить остальное (при < 3 замерах — обычное среднее). */
     static double trimmedMean(double[] r) {
         double[] s = r.clone();
         Arrays.sort(s);
@@ -196,8 +177,6 @@ public class Benchmark {
         for (int i = from; i < to; i++) sum += s[i];
         return sum / (to - from);
     }
-
-    // ------------------------------------------------------------------ CSV
 
     private static PrintWriter csv(String name, String header) throws IOException {
         File f = new File(outDir, name);
@@ -209,7 +188,7 @@ public class Benchmark {
 
     private static void row(PrintWriter w, String line) {
         w.println(line);
-        w.flush();   // данные не потеряются, если прервать замер
+        w.flush();  
     }
 
     private static String runHeader() {

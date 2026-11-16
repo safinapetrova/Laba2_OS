@@ -3,13 +3,6 @@ import java.io.DataOutputStream;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 
-/**
- * Процесс-генератор (задание на «4»). Генерирует матрицы и пишет их в stdout
- * в двоичном формате MatrixIO. В stdout не выводится НИЧЕГО, кроме данных;
- * все сообщения — только в stderr.
- *
- *   java -cp out MatrixGenerator <n> <m> <k> [triangular]
- */
 public class MatrixGenerator {
     public static void main(String[] args) {
         String usage = "Использование: java MatrixGenerator <n> <m> <k> [triangular]";
@@ -30,14 +23,11 @@ public class MatrixGenerator {
                 throw new IllegalArgumentException("для треугольной A нужно m == n");
             }
 
-            // Сначала генерируем всё, потом передаём — так вычислитель может
-            // отдельно измерить время генерации и время передачи.
             long t0 = System.nanoTime();
             long[][] A = triangular ? MatrixMath.generateTriangular(n, 42) : MatrixMath.generateRandom(n, m, 42);
             long[][] B = MatrixMath.generateRandom(m, k, 43);
             long genNanos = System.nanoTime() - t0;
 
-            // FileOutputStream(FileDescriptor.out) — «сырой» stdout без PrintStream и перекодировки
             try (DataOutputStream out = new DataOutputStream(
                     new BufferedOutputStream(new FileOutputStream(FileDescriptor.out), 1 << 16))) {
                 MatrixIO.write(out, new MatrixIO.Payload(triangular, genNanos, A, B));

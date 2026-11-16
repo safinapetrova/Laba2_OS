@@ -1,12 +1,5 @@
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Задание на «3»: A (n×m) · B (m×k) в T потоков, статическое деление строк на блоки,
- * вывод прогресса, время умножения и контрольная сумма.
- *
- *   java -cp out MatrixMul 2000 1500 1800 8
- *   java -cp out MatrixMul 2000 2000 2000 1 ijk     — «школьный» порядок циклов для сравнения
- */
 public class MatrixMul {
     static final String USAGE =
             "Использование: java MatrixMul <n> <m> <k> <T> [ikj|ijk]\n"
@@ -31,7 +24,6 @@ public class MatrixMul {
         System.out.printf("Умножение матриц: A(%dx%d) * B(%dx%d), потоков: %d, порядок циклов: %s%n",
                 n, m, m, k, T, order == MatrixMath.LoopOrder.IKJ ? "i→t→j" : "i→j→t");
 
-        // Генерация — до таймера
         long[][] A = MatrixMath.generateRandom(n, m, 42);
         long[][] B = MatrixMath.generateRandom(m, k, 43);
 
@@ -43,7 +35,7 @@ public class MatrixMul {
         try (ProgressPrinter pp = new ProgressPrinter(done, n)) {
             start = System.nanoTime();
             C = MatrixMath.multiply(A, B, T, MatrixMath.Mode.STATIC, 1, order, done);
-            end = System.nanoTime(); // все рабочие потоки уже завершены (join внутри multiply)
+            end = System.nanoTime();
         }
 
         if (n <= 10 && k <= 10) {

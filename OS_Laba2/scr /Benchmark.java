@@ -11,7 +11,7 @@ public class Benchmark {
     private static int runs = 5;
     private static File outDir = new File("results");
     private static int[] threads;
-    private static long sink;   // не даём JIT выбросить результат
+    private static long sink; 
 
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {

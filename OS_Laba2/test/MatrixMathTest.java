@@ -11,22 +11,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Юнит-тесты (JUnit 5). Тесты вызывают ТОТ ЖЕ код (MatrixMath, MatrixIO,
- * ProgressPrinter), что и программы, на которых делаются замеры.
- *
- * Многопоточные тесты повторяются REPEATS раз: ошибки синхронизации
- * проявляются не при каждом запуске.
- */
-@Timeout(60) // если барьер или join «повиснет», тест упадёт, а не зависнет навсегда
+@Timeout(60)
 public class MatrixMathTest {
 
     private static final int REPEATS = 100;
     private static final MatrixMath.Mode[] MODES = {MatrixMath.Mode.STATIC, MatrixMath.Mode.DYNAMIC};
 
-    // ================================================================ известные результаты
-
-    /** 2×2, результат посчитан вручную: ловит ошибку в индексах (например, A[i][t]*B[j][t]). */
     @Test
     public void smallMatrixKnownResult() {
         long[][] A = {{1, 2}, {3, 4}};
@@ -37,7 +27,6 @@ public class MatrixMathTest {
         }
     }
 
-    /** 2×3 · 3×2: неквадратные матрицы ловят перепутанные n/m/k. */
     @Test
     public void rectangularKnownResult() {
         long[][] A = {{1, 2, 3}, {4, 5, 6}};
@@ -47,7 +36,6 @@ public class MatrixMathTest {
         assertMatrixEquals(expected, MatrixMath.multiply(A, B, 2, "dynamic"));
     }
 
-    /** Оба порядка циклов (i→t→j и i→j→t) дают одинаковый и правильный результат. */
     @Test
     public void bothLoopOrdersGiveSameResult() {
         long[][] A = MatrixMath.generateRandom(17, 23, 5);
@@ -58,15 +46,11 @@ public class MatrixMathTest {
         }
     }
 
-    // ================================================================ граничные случаи
-
-    /** 1×1: минимальный размер, ловит ошибки «на единицу» в границах циклов. */
     @Test
     public void oneByOne() {
         assertMatrixEquals(new long[][]{{35}}, MatrixMath.multiply(new long[][]{{5}}, new long[][]{{7}}, 1, "static"));
     }
 
-    /** Одна строка (1×3 · 3×1 = 1×1). Потоков больше, чем строк: лишние должны просто ничего не делать. */
     @Test
     public void oneRow() {
         long[][] A = {{1, 2, 3}};
@@ -77,7 +61,6 @@ public class MatrixMathTest {
         }
     }
 
-    /** Один столбец (3×1 · 1×3 = 3×3, «внешнее произведение»). */
     @Test
     public void oneColumn() {
         long[][] A = {{1}, {2}, {3}};
@@ -88,7 +71,6 @@ public class MatrixMathTest {
         }
     }
 
-    /** A · E = A и E · A = A. */
     @Test
     public void identity() {
         long[][] A = MatrixMath.generateRandom(6, 6, 123);
@@ -97,7 +79,6 @@ public class MatrixMathTest {
         assertMatrixEquals(A, MatrixMath.multiply(E, A, 4, "static"));
     }
 
-    /** A · 0 = 0: ловит «мусор» в C (например, если C не обнулена или переиспользуется). */
     @Test
     public void zero() {
         long[][] A = MatrixMath.generateRandom(5, 7, 123);
@@ -105,32 +86,24 @@ public class MatrixMathTest {
         assertMatrixEquals(MatrixMath.generateZero(5, 4), MatrixMath.multiply(A, Z, 3, "static"));
     }
 
-    // ================================================================ ошибки ввода
-
-    /** Число столбцов A ≠ числу строк B → IllegalArgumentException, а не мусор или ArrayIndexOutOfBounds. */
     @Test
     public void incompatibleSizes() {
-        long[][] A = {{1, 2}, {3, 4}};      // 2×2
-        long[][] B = {{1, 2, 3}};           // 1×3
+        long[][] A = {{1, 2}, {3, 4}};   
+        long[][] B = {{1, 2, 3}};       
         assertThrows(IllegalArgumentException.class, () -> MatrixMath.multiply(A, B, 1, "static"));
     }
 
     @Test
     public void invalidArgumentsRejected() {
         long[][] A = {{1}};
-        assertThrows(IllegalArgumentException.class, () -> MatrixMath.multiply(A, A, 0, "static"));   // T = 0
-        assertThrows(IllegalArgumentException.class, () -> MatrixMath.multiply(A, A, 1, "dinamic"));  // опечатка
-        assertThrows(IllegalArgumentException.class, () -> MatrixMath.multiply(new long[][]{{1, 2}, {3}}, A, 1, "static")); // рваная A
-        assertThrows(IllegalArgumentException.class, () -> MatrixMath.power(new long[][]{{1, 2}}, 2, 1)); // не квадратная
-        assertThrows(IllegalArgumentException.class, () -> MatrixMath.power(A, 0, 1));                    // p = 0
+        assertThrows(IllegalArgumentException.class, () -> MatrixMath.multiply(A, A, 0, "static")); 
+        assertThrows(IllegalArgumentException.class, () -> MatrixMath.multiply(A, A, 1, "dinamic"));  
+        assertThrows(IllegalArgumentException.class, () -> MatrixMath.multiply(new long[][]{{1, 2}, {3}}, A, 1, "static"));
+        assertThrows(IllegalArgumentException.class, () -> MatrixMath.power(new long[][]{{1, 2}}, 2, 1)); 
+        assertThrows(IllegalArgumentException.class, () -> MatrixMath.power(A, 0, 1));           
     }
 
-    // ================================================================ многопоточность
 
-    /**
-     * Многопоточный результат совпадает с последовательным эталоном (без потоков) при
-     * T = 1, 2, 3, 7 (делит/не делит n = 10), 10 (= n) и 15 (> n). Повторяется REPEATS раз.
-     */
     @Test
     public void multithreadedMatchesSequential() {
         long[][] A = MatrixMath.generateRandom(10, 12, 42);
@@ -147,7 +120,6 @@ public class MatrixMathTest {
         }
     }
 
-    /** Динамический режим с разными порциями, в том числе больше n и не делящими n. */
     @Test
     public void dynamicChunkSizes() {
         long[][] A = MatrixMath.generateRandom(37, 20, 1);
@@ -161,7 +133,6 @@ public class MatrixMathTest {
         }
     }
 
-    /** Статическое деление: блоки покрывают 0..n-1 без пропусков и пересечений, размеры отличаются ≤ 1. */
     @Test
     public void staticBlocksCoverAllRowsExactlyOnce() {
         for (int n = 1; n <= 30; n++) {
@@ -181,12 +152,6 @@ public class MatrixMathTest {
         }
     }
 
-    // ================================================================ прогресс
-
-    /**
-     * В конце счётчик прогресса равен ровно n (100%). С обычным int++ без синхронизации
-     * часть увеличений терялась бы, и тест бы падал.
-     */
     @Test
     public void progressReachesExactly100Percent() {
         long[][] A = MatrixMath.generateRandom(200, 8, 1);
@@ -208,7 +173,6 @@ public class MatrixMathTest {
         assertEquals((5 - 1) * 9, pw.get());
     }
 
-    /** ProgressPrinter печатает в конце именно «100%» и после этого ничего не допечатывает. */
     @Test
     public void progressPrinterEndsWith100() {
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
@@ -221,16 +185,10 @@ public class MatrixMathTest {
         String out = buf.toString().trim();
         assertTrue(out.endsWith("Прогресс: 100%"), "Вывод: " + out);
         assertEquals(37, ProgressPrinter.percent(37, 100));
-        assertEquals(99, ProgressPrinter.percent(2_147_483_000L, 2_147_483_647L)); // без переполнения int
+        assertEquals(99, ProgressPrinter.percent(2_147_483_000L, 2_147_483_647L)); 
     }
 
-    // ================================================================ треугольная матрица
 
-    /**
-     * Треугольная A: static и dynamic совпадают с НЕЗАВИСИМЫМ эталоном — обычным умножением
-     * той же матрицы, записанной квадратной с нулями над диагональью. Если бы какую-то строку
-     * посчитали дважды (C += ...), значения в ней удвоились бы и тест упал бы.
-     */
     @Test
     public void triangularMatchesDenseReference() {
         int n = 23;
@@ -248,7 +206,6 @@ public class MatrixMathTest {
         }
     }
 
-    /** Треугольная 3×3, посчитано вручную. */
     @Test
     public void triangularKnownResult() {
         long[][] tri = {{1}, {2, 3}, {4, 5, 6}};
@@ -258,7 +215,6 @@ public class MatrixMathTest {
         assertMatrixEquals(expected, MatrixMath.multiplyTriangular(tri, B, 2, "dynamic"));
     }
 
-    /** Каждая строка треугольной матрицы обработана ровно один раз (счётчик = n). */
     @Test
     public void triangularEachRowOnce() {
         int n = 64;
@@ -275,34 +231,25 @@ public class MatrixMathTest {
                 () -> MatrixMath.multiplyTriangular(notTri, new long[][]{{1}, {2}}, 1, "static"));
     }
 
-    // ================================================================ степень
 
-    /** A¹ = A (умножений нет, потоки не нужны). */
     @Test
     public void powerOne() {
         long[][] A = MatrixMath.generateRandom(5, 5, 11);
         assertMatrixEquals(A, MatrixMath.power(A, 1, 4));
     }
 
-    /** Eᵖ = E для единичной матрицы. */
     @Test
     public void powerIdentity() {
         long[][] E = MatrixMath.generateIdentity(6);
         assertMatrixEquals(E, MatrixMath.power(E, 10, 4));
     }
 
-    /** A² посчитан вручную: [[1,1],[1,0]]^5 = числа Фибоначчи [[8,5],[5,3]]. */
     @Test
     public void powerFibonacci() {
         long[][] F = {{1, 1}, {1, 0}};
         assertMatrixEquals(new long[][]{{8, 5}, {5, 3}}, MatrixMath.power(F, 5, 2));
     }
 
-    /**
-     * Результат с барьером совпадает с НЕЗАВИСИМЫМ последовательным эталоном A·A·…·A (mod),
-     * для чётного и нечётного числа шагов (проверка выбора итогового буфера) и при T > n
-     * (потоки без строк всё равно должны проходить барьер, иначе — зависание).
-     */
     @Test
     public void powerMatchesSequentialReference() {
         int n = 9;
@@ -319,7 +266,6 @@ public class MatrixMathTest {
         }
     }
 
-    /** Большие степени: значения не переполняются и остаются в [0, MOD). */
     @Test
     public void powerStaysInModRange() {
         long[][] A = MatrixMath.generateRandom(12, 12, 3);
@@ -330,13 +276,10 @@ public class MatrixMathTest {
         for (long[] row : R) for (long v : row) assertTrue(v >= 0 && v < MatrixMath.MOD);
     }
 
-    // ================================================================ передача между процессами
-
-    /** Сериализация → десериализация через поток байт: принятые матрицы совпадают с отправленными. */
     @Test
     public void ioRoundTripDenseAndTriangular() throws IOException {
         long[][] A = MatrixMath.generateRandom(13, 7, 1);
-        A[0][0] = Long.MIN_VALUE; A[1][1] = Long.MAX_VALUE; A[2][2] = -1;   // крайние значения long
+        A[0][0] = Long.MIN_VALUE; A[1][1] = Long.MAX_VALUE; A[2][2] = -1;
         long[][] tri = MatrixMath.generateTriangular(9, 2);
         long[][] B = MatrixMath.generateRandom(7, 5, 3);
         for (long[][] a : new long[][][]{A, tri}) {
@@ -351,7 +294,6 @@ public class MatrixMathTest {
         }
     }
 
-    /** Оборванный поток (передано не всё) → ошибка, а не «тихо» недополученная матрица. */
     @Test
     public void ioTruncatedStreamFails() throws IOException {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -365,17 +307,12 @@ public class MatrixMathTest {
         }
     }
 
-    /** Поток, начинающийся с текста (например, сообщения об ошибке), отвергается по сигнатуре. */
     @Test
     public void ioGarbageRejected() {
         byte[] text = "Error: Could not find or load main class".getBytes();
         assertThrows(IOException.class, () -> MatrixIO.read(new DataInputStream(new ByteArrayInputStream(text))));
     }
 
-    /**
-     * Настоящая межпроцессная передача: запускается дочерний процесс MatrixGenerator,
-     * матрицы приходят через канал и совпадают с тем, что генератор создаёт тем же seed.
-     */
     @Test
     public void realProcessTransfer() throws Exception {
         MatrixIO.Received r = MatrixIO.fetchFromGenerator(30, 20, 10, false);
@@ -387,9 +324,7 @@ public class MatrixMathTest {
         assertMatrixEquals(MatrixMath.generateTriangular(15, 42), t.payload.A);
     }
 
-    // ================================================================ вспомогательное
 
-    /** equals корректно сравнивает ступенчатые (треугольные) массивы. */
     @Test
     public void equalsHandlesJaggedArrays() {
         long[][] A = {{1}, {2, 3}, {4, 5, 6}};

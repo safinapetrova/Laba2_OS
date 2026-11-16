@@ -1,13 +1,5 @@
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Задание на «5»: A^p по модулю 1 000 000 007 в T потоков.
- * Потоки создаются один раз, шаги разделяются барьером (CyclicBarrier).
- *
- *   java -cp out MatrixMulPower 1000 10 8              — с барьером
- *   java -cp out MatrixMulPower 1000 10 8 nobarrier    — эксперимент п. 4.1.6
- *   java -cp out MatrixMulPower 1000 10 8 respawn      — потоки заново на каждом шаге
- */
 public class MatrixMulPower {
     static final String USAGE =
             "Использование: java MatrixMulPower <n> <p> <T> [barrier|nobarrier|respawn]\n"
@@ -42,7 +34,7 @@ public class MatrixMulPower {
         long total = (long) (p - 1) * n;
         long[][] R;
         long start, end;
-        if (total == 0) {                      // p == 1: A^1 = A, умножений нет
+        if (total == 0) {                    
             start = System.nanoTime();
             R = MatrixMath.power(A, 1, T, sync, done);
             end = System.nanoTime();

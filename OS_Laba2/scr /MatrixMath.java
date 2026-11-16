@@ -31,6 +31,7 @@ public final class MatrixMath {
         IJK;
 
         public static LoopOrder parse(String s) {
+            if (s == null) throw new IllegalArgumentException("Не задан порядок циклов");
             switch (s.toLowerCase()) {
                 case "ikj": case "itj": return IKJ;
                 case "ijk": case "ijt": return IJK;
@@ -46,6 +47,7 @@ public final class MatrixMath {
         RESPAWN;
 
         public static PowerSync parse(String s) {
+            if (s == null) throw new IllegalArgumentException("Не задан режим синхронизации");
             switch (s.toLowerCase()) {
                 case "barrier":   return BARRIER;
                 case "nobarrier": case "no_barrier": case "no-barrier": return NO_BARRIER;

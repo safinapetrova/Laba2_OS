@@ -1,14 +1,5 @@
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Задание на «4»: процесс-вычислитель. Запускает дочерний процесс MatrixGenerator,
- * получает матрицы через канал (pipe), умножает их многопоточно (static/dynamic),
- * поддерживает нижнетреугольную A.
- *
- *   java -cp out MatrixMulIPC 2000 2000 2000 8 dynamic
- *   java -cp out MatrixMulIPC 2000 2000 2000 8 static triangular
- *   java -cp out MatrixMulIPC 2000 2000 2000 8 dynamic triangular chunk=8
- */
 public class MatrixMulIPC {
     static final String USAGE =
             "Использование: java MatrixMulIPC <n> <m> <k> <T> [static|dynamic] [triangular] [chunk=N]\n"
@@ -33,7 +24,7 @@ public class MatrixMulIPC {
                 String a = args[i].toLowerCase();
                 if (a.equals("triangular")) triangular = true;
                 else if (a.startsWith("chunk=")) chunk = Cli.positiveInt(a.substring(6), "chunk");
-                else mode = MatrixMath.Mode.parse(a);   // бросит исключение на опечатку
+                else mode = MatrixMath.Mode.parse(a);  
             }
             if (triangular && m != n) {
                 throw new IllegalArgumentException("для треугольной матрицы A нужно m == n (получено n=" + n + ", m=" + m + ")");
